@@ -7,8 +7,9 @@ from read_meter import read_heat_meter
 
 OBIS_descriptions = {
     '6.8': {'metric': 'meter_reading', 'name': 'Zählerstand', 'unit': 'MWh', 'device_class': 'energy'},
+    '6.8*01': {'metric': 'meter_reading_2', 'name': 'Zählerstand 2', 'unit': 'MWh', 'device_class': 'energy'},
     '6.6': {'metric': 'max_heat_output', 'name': 'Max. Heizleistung', 'unit': 'kW', 'device_class': 'energy'},
-    '6.26': {'metric': 'throughput', 'name': 'Durchlauf', 'unit': 'm³', 'device_class': 'gas'},
+    '6.26': {'metric': 'throughput', 'name': 'Durchfluss', 'unit': 'm³', 'device_class': 'gas'},
     '6.33': {'metric': 'max_throughput', 'name': 'Max. Durchfluss', 'unit': 'm³/h', 'device_class': 'gas'},
     '9.4': {'metric': 'max_temp_forward_return_flow', 'name': 'Max. Vorlauf-/Rücklauftemperatur',
             'unit': '°C', 'device_class': 'temperature'},

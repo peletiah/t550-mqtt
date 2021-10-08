@@ -17,6 +17,7 @@ SLEEP_INTERVAL = 0.5
 
 OBIS_codes = [
     '6.8',
+    '6.8*01',
     '6.6',
     '6.26',
     '6.33',
@@ -49,8 +50,6 @@ def read_heat_meter():
     # change baudrate
     ser.baudrate = READ_BAUDRATE
 
-    raw_heat_data = ''
-
     try:
         # read data message
         response = ser.readlines()
@@ -58,6 +57,7 @@ def read_heat_meter():
         ser.close()
 
     raw_heat_data = b''.join(response).decode('utf-8').strip('\x02').replace('\r\n', '').replace('\x03m\x00', '')
+    print(raw_heat_data)
 
     heat_data = dict()
     for metric in raw_heat_data.split(')'):
