@@ -6,8 +6,8 @@ import paho.mqtt.client as mqtt
 from read_meter import read_heat_meter
 
 OBIS_descriptions = {
-    '6.8': {'metric': 'meter_reading', 'name': 'Zählerstand', 'unit': 'MWh', 'device_class': 'energy'},
-    '6.8*01': {'metric': 'meter_reading_2', 'name': 'Zählerstand 2', 'unit': 'MWh', 'device_class': 'energy'},
+    '6.8': {'metric': 'meter_reading', 'name': 'Zählerstand', 'unit': 'kWh', 'device_class': 'energy', 'multiplier': 1000},
+    '6.8*01': {'metric': 'meter_reading_2', 'name': 'Zählerstand 2', 'unit': 'kWh', 'device_class': 'energy', 'multiplier': 1000},
     '6.6': {'metric': 'max_heat_output', 'name': 'Max. Heizleistung', 'unit': 'kW', 'device_class': 'energy'},
     '6.26': {'metric': 'throughput', 'name': 'Durchfluss', 'unit': 'm³', 'device_class': 'gas'},
     '6.33': {'metric': 'max_throughput', 'name': 'Max. Durchfluss', 'unit': 'm³/h', 'device_class': 'gas'},
@@ -47,13 +47,19 @@ def publish_config():
             'state_topic': state_topic, 'unit_of_measurement': unit,
             'value_template': f'{{{{ value_json.{unique_id}}}}}', 'unique_id': unique_id
         }
-        client.publish(config_topic, json.dumps(payload))
+        client.publish(config_topic, payload=json.dumps(payload), qos=2)
         metric_value = heat_data[obis_code]
         try:
             metric_value = int(metric_value)
         except ValueError:
             metric_value = float(metric_value)
-        state_payload[unique_id] = metric_value
+
+        if 'multiplier' in OBIS_descriptions[obis_code]:
+            multiplier = OBIS_descriptions[obis_code]['multiplier'] 
+        else:
+            multiplier = 1
+
+        state_payload[unique_id] = metric_value*multiplier
     return state_payload
 
 
@@ -77,6 +83,6 @@ if __name__ == "__main__":
         time.sleep(1)
     print("in Main Loop")
     state_payload = publish_config()
-    client.publish(state_topic, json.dumps(state_payload))
+    client.publish(state_topic, payload=json.dumps(state_payload), qos=2)
     client.loop_stop()
     client.disconnect()
