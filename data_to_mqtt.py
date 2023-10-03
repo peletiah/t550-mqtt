@@ -13,9 +13,9 @@ OBIS_descriptions = {
     '6.33': {'metric': 'max_throughput', 'name': 'Max. Durchfluss', 'unit': 'm³/h', 'device_class': 'gas'},
     '9.4': {'metric': 'max_temp_forward_return_flow', 'name': 'Max. Vorlauf-/Rücklauftemperatur',
             'unit': '°C', 'device_class': 'temperature'},
-    '6.31': {'metric': 'operating_hours', 'name': 'Betriebsstunden', 'unit': 'h', 'device_class': 'timestamp'},
-    '6.32': {'metric': 'downtime', 'name': 'Stillstand', 'unit': 'h', 'device_class': 'timestamp'},
-    '9.31': {'metric': 'flowhours', 'name': 'Durchflussstunden', 'unit': 'h', 'device_class': 'timestamp'},
+    '6.31': {'metric': 'operating_hours', 'name': 'Betriebsstunden', 'unit': 'h', 'device_class': 'duration'},
+    '6.32': {'metric': 'downtime', 'name': 'Stillstand', 'unit': 'h', 'device_class': 'duration'},
+    '9.31': {'metric': 'flowhours', 'name': 'Durchflussstunden', 'unit': 'h', 'device_class': 'duration'},
 }
 
 
@@ -47,7 +47,9 @@ def publish_config():
             'state_topic': state_topic, 'unit_of_measurement': unit,
             'value_template': f'{{{{ value_json.{unique_id}}}}}', 'unique_id': unique_id
         }
-        client.publish(config_topic, payload=json.dumps(payload), qos=2)
+        client.publish(config_topic, payload=json.dumps(payload), qos=2, retain=True)
+        print(config_topic)
+        print(payload)
         metric_value = heat_data[obis_code]
         try:
             metric_value = int(metric_value)
@@ -77,12 +79,13 @@ if __name__ == "__main__":
     client.on_connect = on_connect  # bind call back function
     client.loop_start()
     print("Connecting to mqtt_broker_ip ", mqtt_broker_ip)
-    client.connect(mqtt_broker_ip)  # connect to mqtt_broker_ip
     while not client.connected_flag:  # wait in loop
         print("In wait loop")
         time.sleep(1)
     print("in Main Loop")
     state_payload = publish_config()
-    client.publish(state_topic, payload=json.dumps(state_payload), qos=2)
+    client.publish(state_topic, payload=json.dumps(state_payload), qos=2, retain=True)
+    print(state_topic)
+    print(state_payload)
     client.loop_stop()
     client.disconnect()
