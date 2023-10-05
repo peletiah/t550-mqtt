@@ -32,7 +32,7 @@ def read_heat_meter():
     """
 
     ser = serial.Serial(SERIAL, baudrate=BAUDRATE, bytesize=BYTESIZE, parity=PARITY, stopbits=STOPBITS,
-                                timeout=TIMEOUT, xonxoff=XONXOFF, rtscts=RTSCTS)
+                        timeout=TIMEOUT, xonxoff=XONXOFF, rtscts=RTSCTS)
 
     # send init message
     ser.write(INIT_MSG)
@@ -57,7 +57,7 @@ def read_heat_meter():
     finally:
         ser.close()
 
-    raw_heat_data = b''.join(response).decode('utf-8').strip('\x02').replace('\r\n','').replace('\x03m\x00','')
+    raw_heat_data = b''.join(response).decode('utf-8').strip('\x02').replace('\r\n', '').replace('\x03m\x00', '')
 
     heat_data = dict()
     for metric in raw_heat_data.split(')'):
